@@ -1,2 +1,7 @@
-# Autentica-o-RFID-e-ESP32NodeMCU
-RFID e ESP32NodeMCU
+# Autenticão-RFID-e-ESP32NodeMCU
+
+DISPOSITIVOS UTILIZADOS
+Leitor Rfid Mfrc522 Mifare
+ESP32S NodeMcu ESP-12
+
+DESCRIÇÃO
