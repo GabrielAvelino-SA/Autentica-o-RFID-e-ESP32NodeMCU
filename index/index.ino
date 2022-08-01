@@ -2,25 +2,46 @@
  
 #include <SPI.h>
 #include <MFRC522.h>
- 
-#define SS_PIN 10
-#define RST_PIN 9
+#include <WiFi.h>
+#include <PubSubClient.h>
 
+#define SS_PIN 14
+#define RST_PIN 27
+
+#define TOPICO_SUBSCRIBE "topco-a-ser-assinado";
+#define TOPICO_PUBLISH "topico-assinado";
+#define MQTT_ID "ip-no-broker";
+
+const char* ssid = "ssid-rede";
+const char* password = "senha-da-rede";
+const char* mqttServer = "endereço-broker";
+int BrokerPort = 1889;//porta
+
+WifiClient espClient; //instancia client esp
+PubSubClient MQTT(espClient);//instancia do objeto MQTT
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Instancia MFRC522
- 
-char st[20];
- 
+
+//Protipos
+void init_WiFi(void);
+void init_MQTT(void);
+void mqtt_callback(char* topic, byte* payload, unsigned int length);
+void verifica_conexoes_wifi_mqtt(void);
+
 void setup() 
 {
   Serial.begin(9600);
-  SPI.begin();
+  SPI.begin();  //inicia o modulo RFID
   mfrc522.PCD_Init();
-  Serial.println("Aproxime o seu cartao do leitor...");
-  Serial.println();
+  init_WiFi();
+  init_MQTT();
+  Serial.println("Aguardando tag RFID para verificar o id da mesma.");
 }
  
 void loop() 
 {
+  String conteudo = "";      // cria uma string
+  
+  Serial.print("id da tag :");
   if ( ! mfrc522.PICC_IsNewCardPresent()) return;//caso nenhuma teg apresentada
   if ( ! mfrc522.PICC_ReadCardSerial()) return;//caso erro na leitura da teg
   //Mostra UID na serial
@@ -35,3 +56,35 @@ void loop()
      conteudo.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
      conteudo.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
+}
+
+//FUNÇOES
+void init_WiFi(){
+  WiFi.begin(ssid,password);
+  while (WiFi.status()!= WL_CONNECTED){
+  Serial.print(".");
+  delay(1000);
+  }
+  Serial.println("\nConeção efetuada com suscessso"); 
+}
+void init_MQTT(){
+  //informa qual broker e porta deve ser conectado
+  MQTT.setServer(mqttServer,BrokerPort);
+  //atribui função de callback (função chamada quando qualquer informação do tópico subescrito chega
+  MQTT.setCallback(mqtt_callback);
+
+}
+void mqtt_callback(char* topic, byte* payload, unsigned int length) 
+{
+    String msg;
+ 
+    //obtem a string do payload recebido
+    for(int i = 0; i < length; i++) 
+    {
+       char c = (char)payload[i];
+       msg += c;
+    }
+    //Aciona o LED
+    if (msg.equals("L"))digitalWrite(0, LOW);
+    if (msg.equals("D"))digitalWrite(0, HIGH);
+}
