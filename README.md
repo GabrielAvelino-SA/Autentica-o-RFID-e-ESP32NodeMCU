@@ -1,7 +1,8 @@
 # Autenticão-RFID-e-ESP32NodeMCU
 
-##Em fase de Desenvolvimento
+## Em fase de Desenvolvimento
 <p>
+
 ## Resumo
 Algoritimo desenvolvido para a gravação e obtenção de dados apartir de TEGs do tipo RFID 13,56Mhz e visando tando a obtenção quanto a publicação destes dados em brokers sejam publicos ou privados.
 ## DESCRIÇÃO
