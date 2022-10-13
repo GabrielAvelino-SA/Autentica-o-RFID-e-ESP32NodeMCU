@@ -84,7 +84,5 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length)
        char c = (char)payload[i];
        msg += c;
     }
-    //Aciona o LED
-    if (msg.equals("L"))digitalWrite(0, LOW);
-    if (msg.equals("D"))digitalWrite(0, HIGH);
+
 }
